@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="layui-row" style="margin-top:20px;">
+  <div class="layui-col-xs12">
+    <div class="layui-card">
+      <div class="layui-card-header">后台管理</div>
+      <div class="layui-card-body">
+        <a class="layui-btn" href="{{ url_for('admin.settings') }}">系统设置</a>
+        <button class="layui-btn layui-btn-disabled">用户管理（占位）</button>
+        <button class="layui-btn layui-btn-disabled">角色管理（占位）</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

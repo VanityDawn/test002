@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="layui-row" style="margin-top:20px;">
+  <div class="layui-col-md6">
+    <div class="layui-card">
+      <div class="layui-card-header">系统设置</div>
+      <div class="layui-card-body">
+        <form class="layui-form" method="post">
+          <div class="layui-form-item">
+            <label class="layui-form-label">应用名称</label>
+            <div class="layui-input-block">
+              <input type="text" name="app_name" value="{{ s.app_name if s else '' }}" class="layui-input" placeholder="请输入应用名称">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">LOGO地址</label>
+            <div class="layui-input-block">
+              <input type="text" name="logo_url" value="{{ s.logo_url if s else '' }}" class="layui-input" placeholder="请输入 LOGO URL">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit>保存</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="layui-row" style="margin-top:20px;">
+  <div class="layui-col-xs12">
+    <div class="layui-card">
+      <div class="layui-card-header">欢迎，{{ session.username }}！</div>
+      <div class="layui-card-body">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md6">
+            <div class="layui-panel" style="padding:16px;">最新报告（占位）</div>
+          </div>
+          <div class="layui-col-md6">
+            <div class="layui-panel" style="padding:16px;">
+              <div class="layui-form" style="margin-bottom:10px;">
+                <div class="layui-row">
+                  <div class="layui-col-md8">
+                    <input id="kw" type="text" placeholder="请输入关键字，如：西昌" class="layui-input">
+                  </div>
+                  <div class="layui-col-md4" style="text-align:right;">
+                    <button id="searchBtn" class="layui-btn">采集</button>
+                  </div>
+                </div>
+              </div>
+              <div id="results"></div>
+              <div id="pager" style="margin-top:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% block scripts %}
+<script>
+if(window.layui){
+  layui.use(['layer','laypage'], function(){
+    var layer = layui.layer;
+    var laypage = layui.laypage;
+    var dataItems = [];
+    function renderList(items){
+      var html = items.map(function(it){
+        return '<div class="layui-card" style="margin-top:10px;">'
+          +'<div class="layui-card-header">'+(it['标题']||'')+'</div>'
+          +'<div class="layui-card-body">'
+          +'<div>'+(it['概要']||'')+'</div>'
+          +'<div><a href="'+(it['原始URL']||'#')+'" target="_blank">原始链接</a></div>'
+          +'</div></div>'
+      }).join('');
+      document.getElementById('results').innerHTML = html || '<div>暂无数据</div>';
+    }
+    function renderPager(total){
+      laypage.render({
+        elem: 'pager',
+        count: total,
+        limit: 5,
+        groups: 5,
+        layout: ['prev','page','next','count'],
+        jump: function(obj, first){
+          var start = (obj.curr - 1) * obj.limit;
+          var end = start + obj.limit;
+          renderList(dataItems.slice(start, end));
+        }
+      });
+    }
+    var btn = document.getElementById('searchBtn');
+    btn && btn.addEventListener('click', async function(){
+      var kw = document.getElementById('kw').value.trim();
+      if(!kw){ layer.msg('请输入关键字'); return; }
+      layer.msg('采集中...');
+      try{
+        const r = await fetch('/api/search?wd=' + encodeURIComponent(kw) + '&limit=25&pages=5&per=5');
+        const data = await r.json();
+        if(data && data.error){ layer.msg('采集失败：' + data.error); }
+        dataItems = data.items || [];
+        renderPager(dataItems.length);
+      }catch(e){ layer.msg('采集失败'); }
+    });
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

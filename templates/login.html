@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="layui-row" style="display:flex;justify-content:center;margin-top:60px;">
+  <div class="layui-col-sm6 layui-col-md4">
+    <div class="layui-card">
+      <div class="layui-card-header" style="background:#0b3a67;color:#fff;">用户登录</div>
+      <div class="layui-card-body">
+        <form class="layui-form" method="post" action="{{ url_for('auth.login') }}">
+          <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+              <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit>登录系统</button>
+              <a href="#" class="layui-btn layui-btn-primary">忘记密码?</a>
+            </div>
+          </div>
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <div class="layui-alert" style="margin-top:10px;color:#c00;">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+if(window.layui){
+  layui.use(['form'], function(){
+    var form = layui.form;
+  });
+}
+</script>
+{% endblock %}

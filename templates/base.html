@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or '系统' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='layui/css/layui.css') }}">
+</head>
+<body class="layui-container">
+  <div class="layui-row" style="padding-top:10px;">
+    <div class="layui-col-xs6">
+      <a href="{{ url_for('index') }}" style="font-weight:600;">{{ (app_settings and app_settings.app_name) or (title or '系统') }}</a>
+    </div>
+    <div class="layui-col-xs6" style="text-align:right;">
+      {% if session and session.get('user_id') %}
+        <a class="layui-btn layui-btn-sm" href="{{ url_for('auth.logout') }}">退出</a>
+      {% else %}
+        <a class="layui-btn layui-btn-sm" href="{{ url_for('auth.login') }}">登录</a>
+      {% endif %}
+    </div>
+  </div>
+  {% block content %}{% endblock %}
+  <script src="{{ url_for('static', filename='layui/layui.js') }}"></script>
+  <script>
+    if(window.layui){ layui.use(function(){}); }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
