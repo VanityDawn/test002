@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-row layui-col-space16">
+  <div class="layui-col-xs12 layui-col-md5">
+    <div class="layui-card">
+      <div class="layui-card-header">新增角色</div>
+      <div class="layui-card-body">
+        <form class="layui-form" method="post">
+          <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+              <input type="text" name="name" required class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">描述</label>
+            <div class="layui-input-block">
+              <input type="text" name="description" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit>创建</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="layui-col-xs12 layui-col-md7">
+    <div class="layui-card">
+      <div class="layui-card-header">角色列表</div>
+      <div class="layui-card-body">
+        <table class="layui-table">
+          <thead>
+            <tr><th>ID</th><th>名称</th><th>描述</th></tr>
+          </thead>
+          <tbody>
+            {% for r in roles %}
+            <tr>
+              <td>{{ r['id'] }}</td>
+              <td>{{ r['name'] }}</td>
+              <td>{{ r['description'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

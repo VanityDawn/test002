@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">AI引擎管理</div>
+  <div class="layui-card-body">
+    <a class="layui-btn" href="{{ url_for('admin_engines_new') }}">新增引擎</a>
+    <div class="engine-grid">
+      {% for r in rows %}
+      <div class="engine-card">
+        <div class="engine-top">
+          <div class="engine-icon">🤖</div>
+          <div class="engine-provider">{{ r['provider'] }}</div>
+        </div>
+        <div class="engine-model">{{ r['model_name'] }}</div>
+        <div class="engine-meta">
+          <div><span class="k">API URL</span><span class="v">{{ r['api_url'] }}</span></div>
+          <div><span class="k">API Key</span><span class="v">{{ (r['api_key'][:4] if r['api_key'] else '') ~ '••••' ~ (r['api_key'][-4:] if r['api_key'] else '') }}</span></div>
+          <div><span class="k">更新时间</span><span class="v">{{ r['updated_at'] }}</span></div>
+        </div>
+        <div class="engine-actions">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" href="{{ url_for('admin_engines_edit', engine_id=r['id']) }}">编辑</a>
+          <a class="layui-btn layui-btn-warm layui-btn-xs" href="{{ url_for('admin_engines_test', engine_id=r['id']) }}">测试</a>
+          <form method="post" action="{{ url_for('admin_engines_delete', engine_id=r['id']) }}" style="display:inline;">
+            <button class="layui-btn layui-btn-danger layui-btn-xs">删除</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+      {% if rows|length == 0 %}
+      <div class="empty">暂无已配置引擎</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<style>
+.engine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:12px}
+.engine-card{border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#111827,#1f2937);color:#e5e7eb;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.engine-top{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#3b82f6,#06b6d4)}
+.engine-icon{font-size:22px}
+.engine-provider{font-size:16px;font-weight:600;color:#fff}
+.engine-model{padding:10px 16px;font-size:14px;color:#93c5fd}
+.engine-meta{padding:8px 16px}
+.engine-meta .k{display:inline-block;min-width:90px;color:#9ca3af}
+.engine-meta .v{color:#e5e7eb}
+.engine-actions{padding:10px 16px;display:flex;gap:8px}
+.empty{padding:24px;text-align:center;color:#9ca3af;background:#f3f4f6;border-radius:8px}
+</style>
+{% endblock %}

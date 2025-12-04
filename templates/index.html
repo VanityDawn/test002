@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">欢迎</div>
+  <div class="layui-card-body">
+    <p>技术栈：B/S + layui + Python3 + Flask + SQLite</p>
+    <button class="layui-btn" id="demo-btn">点击测试</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+layui.use(function(){
+  var layer = layui.layer;
+  var $ = layui.$;
+  $('#demo-btn').on('click', function(){
+    layer.msg('layui 已就绪');
+  });
+});
+</script>
+{% endblock %}

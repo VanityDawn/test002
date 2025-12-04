@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">数据仓库管理</div>
+  <div class="layui-card-body">
+    <form class="layui-form" method="get" style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+      <input class="layui-input" name="q" value="{{ q }}" placeholder="搜索标题/来源/关键词" style="max-width:280px;">
+      <button class="layui-btn" lay-submit>查询</button>
+    </form>
+    <table class="layui-table">
+      <thead>
+        <tr><th>ID</th><th>标题</th><th>来源</th><th>原始URL</th><th>时间</th><th>深度状态</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r['id'] }}</td>
+          <td>{{ r['title'] }}</td>
+          <td>{{ r['source'] }}</td>
+          <td><a class="layui-font-blue" target="_blank" href="{{ r['original_url'] }}">打开</a></td>
+          <td>{{ r['created_at'] }}</td>
+          <td class="deep-status">{{ '已执行' if r['deep_done'] else '未执行' }}</td>
+          <td>
+            <button class="layui-btn layui-btn-warm layui-btn-xs btn-collect" data-id="{{ r['id'] }}">详细采集</button>
+            <button class="layui-btn layui-btn-normal layui-btn-xs btn-preview" data-id="{{ r['id'] }}">预览</button>
+            <button class="layui-btn layui-btn-primary layui-btn-xs btn-deep" data-id="{{ r['id'] }}" {% if r['deep_done'] %}disabled{% endif %}>深度采集</button>
+            {% if session.get('role_name') == 'admin' %}
+            <a class="layui-btn layui-btn-primary layui-btn-xs" href="{{ url_for('warehouse_edit', article_id=r['id']) }}">编辑</a>
+            <form method="post" action="{{ url_for('warehouse_delete', article_id=r['id']) }}" style="display:inline;">
+              <button class="layui-btn layui-btn-danger layui-btn-xs">删除</button>
+            </form>
+            <button class="layui-btn layui-btn-warm layui-btn-xs btn-analyze" data-id="{{ r['id'] }}">AI解析</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+layui.use(function(){
+  var $ = layui.$; var layer = layui.layer;
+  $('.btn-collect').on('click', function(){
+    var id = $(this).data('id'); var $btn=$(this);
+    $btn.prop('disabled', true);
+    $.ajax({
+      url:'/api/warehouse/collect/' + id,
+      method:'POST',
+      success:function(r){
+        if(r && r.ok){
+          layer.msg('详细采集完成');
+          $btn.closest('tr').find('.deep-status').text('已执行');
+        } else {
+          layer.msg('未获取到正文');
+        }
+        $btn.prop('disabled', false);
+      },
+      error:function(){ layer.msg('操作失败'); $btn.prop('disabled', false); }
+    });
+  });
+  $('.btn-preview').on('click', function(){
+    var id = $(this).data('id');
+    $.getJSON('/api/warehouse/preview/' + id, function(r){
+      var title = (r && r.title) || '';
+      var content = (r && r.content) || '';
+      layer.open({
+        title: '预览',
+        area: ['720px','540px'],
+        content: '<div class="layui-text"><h3>' + (title||'') + '</h3><pre style="white-space:pre-wrap;word-wrap:break-word;">' + (content||'') + '</pre></div>'
+      });
+    }).fail(function(){ layer.msg('预览失败'); });
+  });
+  $('.btn-deep').on('click', function(){
+    var id = $(this).data('id'); var $btn=$(this);
+    $btn.prop('disabled', true);
+    $.ajax({
+      url: '/api/articles/deep/' + id,
+      method: 'POST',
+      success: function(r){
+        layer.msg('深度采集完成');
+        $btn.closest('tr').find('.deep-status').text('已执行');
+      },
+      error: function(){
+        layer.msg('深度采集失败');
+        $btn.prop('disabled', false);
+      }
+    });
+  });
+  $('.btn-analyze').on('click', function(){
+    var id = $(this).data('id');
+    $.ajax({
+      url:'/api/warehouse/analyze/' + id,
+      method:'POST',
+      success:function(r){ layer.msg('AI解析入口已预留'); },
+      error:function(){ layer.msg('操作失败'); }
+    });
+  });
+});
+</script>
+{% endblock %}

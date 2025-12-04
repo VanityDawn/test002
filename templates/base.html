@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='layui/css/layui.css') }}">
+</head>
+<body>
+  <div class="layui-header">
+    <div class="layui-container">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
+        {% if app_logo_url %}
+        <img src="{{ app_logo_url }}" alt="logo" style="height:32px;">
+        {% endif %}
+        <span class="layui-font-18">{{ app_name }}</span>
+        <ul class="layui-nav layui-layout-right" style="margin-left:auto;">
+          <li class="layui-nav-item"><a href="{{ url_for('dashboard') }}">首页</a></li>
+          {% if current_user %}
+          <li class="layui-nav-item"><a href="{{ url_for('crawl_page') }}">数据采集管理</a></li>
+          <li class="layui-nav-item"><a href="{{ url_for('warehouse_list') }}">数据仓库管理</a></li>
+          {% endif %}
+          {% if session.get('role_name') == 'admin' %}
+          <li class="layui-nav-item">
+            <a href="javascript:;">后台</a>
+            <dl class="layui-nav-child">
+              <dd><a href="{{ url_for('admin_users') }}">用户管理</a></dd>
+              <dd><a href="{{ url_for('admin_roles') }}">角色管理</a></dd>
+              <dd><a href="{{ url_for('admin_settings') }}">系统设置</a></dd>
+              <dd><a href="{{ url_for('admin_rules_list') }}">采集规则库</a></dd>
+              <dd><a href="{{ url_for('admin_engines_list') }}">AI引擎管理</a></dd>
+            </dl>
+          </li>
+          {% endif %}
+          {% if current_user %}
+          <li class="layui-nav-item"><a href="{{ url_for('logout') }}">退出</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="layui-container" style="padding: 16px;">
+    {% block content %}{% endblock %}
+  </div>
+  <script src="{{ url_for('static', filename='layui/layui.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

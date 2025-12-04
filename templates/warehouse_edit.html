@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">编辑数据</div>
+  <div class="layui-card-body">
+    <form class="layui-form" method="post">
+      <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+          <input type="text" name="title" value="{{ row['title'] }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">来源</label>
+        <div class="layui-input-block">
+          <input type="text" name="source" value="{{ row['source'] }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">封面</label>
+        <div class="layui-input-block">
+          <input type="text" name="cover_url" value="{{ row['cover_url'] }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">关键词</label>
+        <div class="layui-input-block">
+          <input type="text" name="keyword" value="{{ row['keyword'] }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">原始URL</label>
+        <div class="layui-input-block">
+          <input type="text" value="{{ row['original_url'] }}" class="layui-input" disabled>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">概要</label>
+        <div class="layui-input-block">
+          <textarea name="summary" class="layui-textarea" style="min-height:120px;">{{ row['summary'] }}</textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">深度正文</label>
+        <div class="layui-input-block">
+          <textarea name="deep_content" class="layui-textarea" style="min-height:200px;">{{ row['deep_content'] }}</textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit>保存</button>
+          <a class="layui-btn layui-btn-primary" href="{{ url_for('warehouse_list') }}">返回</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

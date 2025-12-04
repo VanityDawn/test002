@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">AI引擎测试</div>
+  <div class="layui-card-body">
+    {% if error %}
+    <div class="layui-elem-quote" style="color:#ff5722;">{{ error }}</div>
+    {% endif %}
+    <div class="chat-top">
+      <div>
+        <select id="engine">
+          <option value="">请选择引擎</option>
+          {% for e in engines %}
+          <option value="{{ e['id'] }}" {% if selected_id == e['id'] %}selected{% endif %}>{{ e['provider'] }} - {{ e['model_name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <input id="sys" class="layui-input" value="{{ system_prompt }}" placeholder="系统提示(可选)">
+      <a class="layui-btn layui-btn-primary" href="{{ url_for('admin_engines_list') }}">返回</a>
+    </div>
+    <div id="chat" class="chat-box"></div>
+    <div class="chat-input">
+      <input id="msg" class="layui-input" placeholder="输入消息，回车发送">
+      <button id="send" class="layui-btn">发送</button>
+    </div>
+  </div>
+</div>
+<style>
+.chat-top{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.chat-box{height:480px;border:1px solid #eee;border-radius:8px;padding:12px;overflow-y:auto;background:#fafafa}
+.chat-input{display:flex;gap:8px;align-items:center;margin-top:12px}
+.bubble{max-width:70%;margin:6px 0;padding:10px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+.bubble.user{margin-left:auto;background:#3b82f6;color:#fff;border-bottom-right-radius:2px}
+.bubble.assistant{margin-right:auto;background:#e5e7eb;color:#111827;border-bottom-left-radius:2px}
+.meta{font-size:12px;opacity:.7;margin-bottom:4px}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+layui.use(function(){
+  var $ = layui.$; var layer = layui.layer;
+  var messages = [];
+  function render(){
+    var $box = $('#chat');
+    $box.empty();
+    messages.forEach(function(m){
+      var role = m.role;
+      var meta = $('<div class="meta">'+ (role==='user'?'我':'助手') +'</div>');
+      var bubble = $('<div class="bubble '+ (role==='user'?'user':'assistant') +'"></div>');
+      bubble.text(m.content || '');
+      $box.append(meta).append(bubble);
+    });
+    $box.scrollTop($box[0].scrollHeight);
+  }
+  function send(){
+    var engineId = $('#engine').val();
+    var sys = $('#sys').val();
+    var text = $('#msg').val().trim();
+    if(!engineId){ layer.msg('请选择引擎'); return; }
+    if(!text){ return; }
+    messages.push({role:'user', content:text});
+    $('#msg').val('');
+    render();
+    $('#send').prop('disabled', true);
+    $.ajax({
+      url:'/admin/engines/chat',
+      method:'POST',
+      contentType:'application/json',
+      data: JSON.stringify({engine_id: engineId, system_prompt: sys, messages: messages}),
+      success:function(r){
+        if(r && r.ok){ messages.push({role:'assistant', content:r.reply||''}); } else { layer.msg(r && r.error ? r.error : '失败'); }
+        render();
+        $('#send').prop('disabled', false);
+      },
+      error:function(xhr){ layer.msg('请求失败'); $('#send').prop('disabled', false); }
+    });
+  }
+  $('#send').on('click', send);
+  $('#msg').on('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); send(); } });
+});
+</script>
+{% endblock %}

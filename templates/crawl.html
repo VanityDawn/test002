@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">关键词采集</div>
+  <div class="layui-card-body">
+    <div style="margin-bottom:12px;">
+      <div class="layui-progress" lay-showPercent="true" lay-filter="crawlProgress">
+        <div class="layui-progress-bar" lay-percent="0%"></div>
+      </div>
+    </div>
+    <div class="layui-form" id="crawl-form" style="display:flex;gap:12px;align-items:center;">
+      <input class="layui-input" id="kw" placeholder="请输入关键词，如：宜宾" style="max-width:280px;">
+      <input class="layui-input" id="limit" value="10" style="width:100px;">
+      <input class="layui-input" id="delay" value="500" placeholder="延迟ms" style="width:120px;">
+      <button class="layui-btn" id="btn-crawl" type="button">采集</button>
+      <button class="layui-btn layui-btn-normal" id="btn-save" type="button" disabled>保存选中</button>
+    </div>
+    <table class="layui-table" id="result-table">
+      <thead>
+        <tr>
+          <th>选择</th>
+          <th>标题</th>
+          <th>来源</th>
+          <th>概要</th>
+          <th>封面</th>
+          <th>原始URL</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+layui.use(function(){
+  var $ = layui.$;
+  var layer = layui.layer;
+  var element = layui.element;
+  var data = [];
+  function render(){
+    var tbody = $('#result-table tbody');
+    tbody.empty();
+    data.forEach(function(it, idx){
+      var img = it.cover ? ('<img src="'+it.cover+'" style="height:32px">') : '';
+      var row = '<tr>'+
+        '<td><input type="checkbox" data-idx="'+idx+'"></td>'+
+        '<td>'+ (it.title||'') +'</td>'+
+        '<td>'+ (it.source||'') +'</td>'+
+        '<td>'+ (it.summary||'') +'</td>'+
+        '<td>'+ img +'</td>'+
+        '<td><a class="layui-font-blue" target="_blank" href="'+ (it.url||'#') +'">打开</a></td>'+
+        '</tr>';
+      tbody.append(row);
+    });
+    $('#btn-save').prop('disabled', data.length===0);
+  }
+  $('#btn-crawl').on('click', function(){
+    var busy = $('#btn-crawl').prop('disabled');
+    if(busy) return;
+    var kw = $('#kw').val().trim();
+    var limit = $('#limit').val().trim() || '20';
+    if(!kw){ return layer.msg('请输入关键词'); }
+    $('#btn-crawl').prop('disabled', true);
+    element.progress('crawlProgress','0%');
+    var p=0; var timer=setInterval(function(){ p=Math.min(95,p+5); element.progress('crawlProgress', p+'%'); }, 300);
+    $.getJSON('/api/crawl', { q: kw, limit: limit, delay_ms: $('#delay').val().trim() }, function(res){
+      data = res || [];
+      render();
+      layer.msg('采集完成：'+data.length+'条');
+      clearInterval(timer); element.progress('crawlProgress','100%');
+      setTimeout(function(){ element.progress('crawlProgress','0%'); }, 800);
+      $('#btn-crawl').prop('disabled', false);
+    }).fail(function(){
+      clearInterval(timer); element.progress('crawlProgress','0%');
+      $('#btn-crawl').prop('disabled', false);
+      layer.msg('采集失败，请稍后重试');
+    });
+  });
+  $('#btn-save').on('click', function(){
+    var selected = [];
+    $('#result-table tbody input[type=checkbox]:checked').each(function(){
+      var idx = $(this).data('idx');
+      selected.push(data[idx]);
+    });
+    if(selected.length===0){ return layer.msg('请选择要保存的条目'); }
+    var kw = $('#kw').val().trim();
+    $.ajax({
+      url:'/api/articles/save',
+      method:'POST',
+      contentType:'application/json',
+      data: JSON.stringify({ items: selected, keyword: kw }),
+      success:function(r){
+        layer.msg('已保存 '+ (r && r.count || 0) +' 条');
+      },
+      error:function(){ layer.msg('保存失败'); }
+    });
+  });
+});
+</script>
+{% endblock %}

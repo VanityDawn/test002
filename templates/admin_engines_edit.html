@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">{{ '编辑引擎' if row else '新增引擎' }}</div>
+  <div class="layui-card-body">
+    {% if error %}
+    <div class="layui-elem-quote" style="color:#ff5722;">{{ error }}</div>
+    {% endif %}
+    <form class="layui-form" method="post">
+      <div class="layui-form-item">
+        <label class="layui-form-label">服务商</label>
+        <div class="layui-input-block">
+          <input type="text" name="provider" value="{{ row['provider'] if row else '' }}" class="layui-input" placeholder="例如：OpenAI、Azure、火山、百度等">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">API URL</label>
+        <div class="layui-input-block">
+          <input type="text" name="api_url" value="{{ row['api_url'] if row else '' }}" class="layui-input" placeholder="例如：https://api.openai.com/v1/chat/completions">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">API Key</label>
+        <div class="layui-input-block">
+          <input type="text" name="api_key" value="{{ row['api_key'] if row else '' }}" class="layui-input" placeholder="密钥仅用于服务调用">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">模型名称</label>
+        <div class="layui-input-block">
+          <input type="text" name="model_name" value="{{ row['model_name'] if row else '' }}" class="layui-input" placeholder="例如：gpt-4o-mini、gpt-4、glm-4等">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit>保存</button>
+          <a class="layui-btn layui-btn-primary" href="{{ url_for('admin_engines_list') }}">返回</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

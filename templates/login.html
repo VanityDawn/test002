@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_name }} - 用户登录</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='layui/css/layui.css') }}">
+  <style>
+    body{background:#f5f7fa}
+    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+    .login-card{width:100%;max-width:460px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.08)}
+    .login-header{background:linear-gradient(90deg,#0b4b7f,#0a3a68);color:#fff;padding:16px 20px;border-radius:12px 12px 0 0}
+    .login-title{font-size:18px;font-weight:600}
+    .login-sub{opacity:.85;margin-top:4px}
+    .login-actions{display:flex;justify-content:space-between;align-items:center}
+    .login-btn{width:100%;background:#0b4b7f}
+    .login-btn:hover{opacity:.95}
+    .login-footer{opacity:.7;text-align:center;margin-top:16px}
+    .alt-login{display:flex;gap:12px;margin-top:12px}
+    .alt-login .layui-input{background:#f7f7f7}
+  </style>
+  <script src="{{ url_for('static', filename='layui/layui.js') }}"></script>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="layui-card login-card">
+      <div class="login-header">
+        <div class="login-title">用户登录</div>
+        <div class="login-sub">{{ app_name }}</div>
+      </div>
+      <div class="layui-card-body">
+        {% if error %}
+        <div class="layui-elem-quote" style="margin-bottom:12px;color:#ff5722;">{{ error }}</div>
+        {% endif %}
+        <form class="layui-form" method="post">
+          <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+              <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item login-actions">
+            <div>
+              <input type="checkbox" name="remember" title="记住我" lay-skin="primary">
+            </div>
+            <div>
+              <a href="{{ url_for('forgot') }}" class="layui-font-blue">忘记密码?</a>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn login-btn" lay-submit>登录系统</button>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-font-12" style="opacity:.8">其他登录方式</div>
+            <div class="alt-login">
+              <input class="layui-input" disabled value="">
+              <input class="layui-input" disabled value="">
+            </div>
+          </div>
+        </form>
+        <div class="login-footer layui-font-12">© 2023 政企智能舆情分析平台 版权所有 | 帮助中心 | 隐私政策 | 联系我们</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

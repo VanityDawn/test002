@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">采集规则库</div>
+  <div class="layui-card-body">
+    <a class="layui-btn" href="{{ url_for('admin_rules_new') }}">新增规则</a>
+    <table class="layui-table" style="margin-top:12px;">
+      <thead>
+        <tr><th>ID</th><th>站点</th><th>标题XPath</th><th>内容XPath</th><th>Headers</th><th>更新时间</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r['id'] }}</td>
+          <td><span class="clip">{{ r['site'] }}</span></td>
+          <td><span class="clip">{{ r['title_xpath'] }}</span></td>
+          <td><span class="clip">{{ r['content_xpath'] }}</span></td>
+          <td><span class="clip">{{ r['headers_json'] }}</span></td>
+          <td><span class="clip">{{ r['updated_at'] }}</span></td>
+          <td>
+            <button class="layui-btn layui-btn-xs btn-toggle" 
+              data-site="{{ r['site'] }}" 
+              data-title="{{ r['title_xpath'] }}" 
+              data-content="{{ r['content_xpath'] }}" 
+              data-headers="{{ r['headers_json'] }}">展开</button>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" href="{{ url_for('admin_rules_preview', rule_id=r['id']) }}">预览</a>
+            <a class="layui-btn layui-btn-primary layui-btn-xs" href="{{ url_for('admin_rules_edit', rule_id=r['id']) }}">编辑</a>
+            <form method="post" action="{{ url_for('admin_rules_delete', rule_id=r['id']) }}" style="display:inline;">
+              <button class="layui-btn layui-btn-danger layui-btn-xs">删除</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<style>
+.clip{max-width:240px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-wrap{padding:12px;background:#f7f8fa}
+.detail-wrap .k{display:inline-block;min-width:120px;color:#666}
+.detail-wrap pre{white-space:pre-wrap;word-wrap:break-word;margin:0}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+layui.use(function(){
+  var $ = layui.$;
+  $('.btn-toggle').on('click', function(){
+    var $btn = $(this);
+    var $tr = $btn.closest('tr');
+    var next = $tr.next('.row-detail');
+    if(next.length){
+      if(next.is(':visible')){ next.hide(); $btn.text('展开'); } else { next.show(); $btn.text('折叠'); }
+      return;
+    }
+    var site = $btn.data('site')||'';
+    var title = $btn.data('title')||'';
+    var content = $btn.data('content')||'';
+    var headers = $btn.data('headers')||'';
+    var html = '<tr class="row-detail"><td colspan="7"><div class="detail-wrap">'
+      + '<div><span class="k">站点</span><pre>'+ site +'</pre></div>'
+      + '<div><span class="k">标题XPath</span><pre>'+ title +'</pre></div>'
+      + '<div><span class="k">内容XPath</span><pre>'+ content +'</pre></div>'
+      + '<div><span class="k">Headers</span><pre>'+ headers +'</pre></div>'
+      + '</div></td></tr>';
+    $tr.after(html);
+    $btn.text('折叠');
+  });
+});
+</script>
+{% endblock %}

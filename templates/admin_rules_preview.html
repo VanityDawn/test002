@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">规则预览 - {{ rule['site'] }}</div>
+  <div class="layui-card-body">
+    {% if error %}
+    <div class="layui-elem-quote" style="color:#ff5722;">{{ error }}</div>
+    {% endif %}
+    <form class="layui-form" method="post" style="display:flex;gap:12px;align-items:center;">
+      <input class="layui-input" name="url" value="{{ url_input }}" placeholder="输入目标页面URL，例如：https://..." style="max-width:420px;">
+      <button class="layui-btn" lay-submit>预览</button>
+      <a class="layui-btn layui-btn-primary" href="{{ url_for('admin_rules_list') }}">返回规则列表</a>
+    </form>
+    <div class="layui-row" style="margin-top:16px;">
+      <div class="layui-col-xs12">
+        <div class="layui-card">
+          <div class="layui-card-header">标题</div>
+          <div class="layui-card-body">{{ result_title }}</div>
+        </div>
+      </div>
+      <div class="layui-col-xs12">
+        <div class="layui-card">
+          <div class="layui-card-header">正文</div>
+          <div class="layui-card-body">
+            <pre style="white-space:pre-wrap;word-wrap:break-word;">{{ result_content }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ </div>
+{% endblock %}

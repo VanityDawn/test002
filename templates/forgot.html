@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>找回密码</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='layui/css/layui.css') }}">
+  <style>
+    body{background:#f5f7fa}
+    .wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+    .card{width:100%;max-width:520px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.08)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="layui-card card">
+      <div class="layui-card-header">找回密码</div>
+      <div class="layui-card-body">
+        <p class="layui-text">请联系系统管理员重置密码，或使用管理员账号登录后台在“用户管理”中修改。</p>
+        <a class="layui-btn" href="{{ url_for('login') }}">返回登录</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

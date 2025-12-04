@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-row layui-col-space16">
+  <div class="layui-col-xs12 layui-col-md5">
+    <div class="layui-card">
+      <div class="layui-card-header">新增用户</div>
+      <div class="layui-card-body">
+        <form class="layui-form" method="post">
+          <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+              <input type="text" name="username" required class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" required class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">角色</label>
+            <div class="layui-input-block">
+              <select name="role" class="layui-input">
+                {% for r in roles %}
+                <option value="{{ r['name'] }}">{{ r['name'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn" lay-submit>创建</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="layui-col-xs12 layui-col-md7">
+    <div class="layui-card">
+      <div class="layui-card-header">用户列表</div>
+      <div class="layui-card-body">
+        <table class="layui-table">
+          <thead>
+            <tr><th>ID</th><th>用户名</th><th>角色</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u['id'] }}</td>
+              <td>{{ u['username'] }}</td>
+              <td>{{ u['role_name'] or '' }}</td>
+              <td>{{ '启用' if u['is_active'] else '停用' }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin_users_delete', user_id=u['id']) }}" style="display:inline;">
+                  <button class="layui-btn layui-btn-danger layui-btn-xs">删除</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

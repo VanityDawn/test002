@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="layui-card">
+  <div class="layui-card-header">{{ '编辑规则' if row else '新增规则' }}</div>
+  <div class="layui-card-body">
+    {% if error %}
+    <div class="layui-elem-quote" style="color:#ff5722;">{{ error }}</div>
+    {% endif %}
+    <form class="layui-form" method="post">
+      <div class="layui-form-item">
+        <label class="layui-form-label">站点</label>
+        <div class="layui-input-block">
+          <input type="text" name="site" value="{{ row['site'] if row else '' }}" placeholder="示例：news.example.com" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">标题XPath</label>
+        <div class="layui-input-block">
+          <input type="text" name="title_xpath" value="{{ row['title_xpath'] if row else '' }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">内容XPath</label>
+        <div class="layui-input-block">
+          <input type="text" name="content_xpath" value="{{ row['content_xpath'] if row else '' }}" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">Headers(JSON)</label>
+        <div class="layui-input-block">
+          <textarea name="headers_json" class="layui-textarea" style="min-height:120px;" placeholder='{"User-Agent":"...","Cookie":"..."}'>{{ row['headers_json'] if row else '' }}</textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit>保存</button>
+          <a class="layui-btn layui-btn-primary" href="{{ url_for('admin_rules_list') }}">返回</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
