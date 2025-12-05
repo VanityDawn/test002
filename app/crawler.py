@@ -219,14 +219,42 @@ def deep_fetch_text(url: str) -> str:
     return _extract_main_text(html)
 
 
+def _sanitize_headers_for_url(url: str, headers: dict) -> dict:
+    h = dict(headers or {})
+    enc = h.get('accept-encoding') or h.get('Accept-Encoding')
+    if enc and ('br' in enc or 'zstd' in enc):
+        h['accept-encoding'] = 'gzip, deflate'
+    if not (h.get('user-agent') or h.get('User-Agent')):
+        h['user-agent'] = HEADERS['user-agent']
+    if not (h.get('referer') or h.get('Referer')):
+        h['referer'] = url
+    return h
+
+
+def _extract_baijiahao_text(html: str) -> str | None:
+    soup = BeautifulSoup(html, 'html.parser')
+    for sel in ['#content', 'div.content', 'div.article', '#article', 'div.article-content', 'section']:
+        el = soup.select_one(sel)
+        if el:
+            t = el.get_text(' ', strip=True)
+            if t:
+                return t
+    return None
+
+
 def deep_fetch_with_rule(url: str, headers_override: dict | None, title_xpath: str | None, content_xpath: str | None):
     headers = dict(HEADERS)
     if headers_override:
         headers.update(headers_override)
+    headers = _sanitize_headers_for_url(url, headers)
     r = requests.get(url, headers=headers, timeout=20, allow_redirects=True)
     r.raise_for_status()
     text = _decode_content(r)
     if not lxml_html:
+        # 特殊站点回退
+        if 'baijiahao.baidu.com' in url:
+            bx = _extract_baijiahao_text(text) or ''
+            return None, bx or _extract_main_text(text)
         return None, _extract_main_text(text)
     doc = lxml_html.fromstring(text)
     title = None
@@ -247,7 +275,9 @@ def deep_fetch_with_rule(url: str, headers_override: dict | None, title_xpath: s
     except Exception:
         pass
     if not content:
-        content = _extract_main_text(text)
+        if 'baijiahao.baidu.com' in url:
+            content = _extract_baijiahao_text(text) or ''
+        content = content or _extract_main_text(text)
     return (title or '').strip(), (content or '').strip()
 
 
@@ -255,6 +285,7 @@ def fetch_page_text(url: str, headers_override: dict | None = None) -> str:
     headers = dict(HEADERS)
     if headers_override:
         headers.update(headers_override)
+    headers = _sanitize_headers_for_url(url, headers)
     r = requests.get(url, headers=headers, timeout=20, allow_redirects=True)
     r.raise_for_status()
     return _decode_content(r)
